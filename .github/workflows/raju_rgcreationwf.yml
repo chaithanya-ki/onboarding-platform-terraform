@@ -1,4 +1,4 @@
-name: 'raju_rgcreation'
+name: 'raju_rgcreationwf'
 
 on:
   repository_dispatch:
