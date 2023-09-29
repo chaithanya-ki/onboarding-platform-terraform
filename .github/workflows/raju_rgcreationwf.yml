@@ -1,4 +1,4 @@
-name: Create Resource Group
+name: Terraform Create Resource Group
 
 on:
   push:
@@ -10,16 +10,16 @@ on:
         type: choice
         description: Choose the environment to deploy the Terraform code
         options: 
-        - nonprod
-        - qa
-        - prod
+          - nonprod
+          - qa
+          - prod
 
 permissions:
   contents: read
 
 jobs:
-  Create-Resource-Group:
-    name: 'Create Resource Group'
+  Terraform_Create:
+    name: 'Terraform'
     runs-on: ubuntu-latest
 
     steps:
@@ -34,11 +34,24 @@ jobs:
       run: |
         az login --service-principal -u "f0a2d8fe-8543-4bfa-b024-48a9f84bef8e" -p "K1K8Q~fP~kdskV1Iwy5qI46qEynSIqgZGwxWqaR7" --tenant "365b7084-5c3e-4b25-8a5e-18fb4e9bd8d5" >/dev/null
 
-    - name: Create Resource Group
+    - name: Change directory to Terraform environment
       run: |
-        cd ${GITHUB_WORKSPACE}/azure-infra/
-        ls -la
-        pwd
-        az group create \
-          --name BackstageTesting \
-          --location eastus
+        cd azure-infra/
+        echo "TF_Workspace is ${{ env.TF_Workspace }}"
+        ls -la   # List files and directories in the current directory
+        pwd      # Print the current working directory
+
+    - name: Terraform Init
+      run: |
+        cd azure-infra/
+        terraform init 
+
+    - name: Terraform Plan
+      run: |
+        cd azure-infra/
+        terraform plan -input=false
+
+    - name: Terraform Apply
+      run: |
+        cd azure-infra/
+        terraform apply -auto-approve -input=false
