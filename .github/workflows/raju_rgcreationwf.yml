@@ -1,8 +1,8 @@
 name: 'raju_rgcreationwf'
 
 on:
-  repository_dispatch:
-    types:
+  push:
+    branches:
       - raju_rgcreation
   workflow_dispatch:
     inputs:
