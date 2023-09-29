@@ -36,6 +36,9 @@ jobs:
 
     - name: Create Resource Group
       run: |
+        cd ${GITHUB_WORKSPACE}/azure-infra/
+        ls -la
+        pwd
         az group create \
           --name BackstageTesting \
           --location eastus
