@@ -1,8 +1,8 @@
-name: Terraform Create Resource Group
+name: 'tf-storage-api'
 
 on:
-  push:
-    branches:
+  repository_dispatch:
+    types:
       - raju_rgcreation
   workflow_dispatch:
     inputs:
@@ -10,48 +10,60 @@ on:
         type: choice
         description: Choose the environment to deploy the Terraform code
         options: 
-          - nonprod
-          - qa
-          - prod
+        - nonprod
+        - qa
+        - prod
 
 permissions:
   contents: read
+
+env:
+  TF_Workspace: "${GITHUB_WORKSPACE}/${{ github.event.inputs.environment }}/azure-infra/"
 
 jobs:
   Terraform_Create:
     name: 'Terraform'
     runs-on: ubuntu-latest
 
+    env: 
+      ARM_CLIENT_ID: "f0a2d8fe-8543-4bfa-b024-48a9f84bef8e"                  # Replace with your Azure service principal client ID
+      ARM_CLIENT_SECRET: "K1K8Q~fP~kdskV1Iwy5qI46qEynSIqgZGwxWqaR7"          # Replace with your Azure service principal client secret
+      ARM_SUBSCRIPTION_ID: "2ca58774-7036-497b-b760-19c980c4fb37"      # Replace with your Azure subscription ID
+      ARM_TENANT_ID: "365b7084-5c3e-4b25-8a5e-18fb4e9bd8d5"                  # Replace with your Azure tenant ID
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
       
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+
     - name: Install Azure CLI
       run: |
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    
+
     - name: Login to Azure 
       run: |
-        az login --service-principal -u "f0a2d8fe-8543-4bfa-b024-48a9f84bef8e" -p "K1K8Q~fP~kdskV1Iwy5qI46qEynSIqgZGwxWqaR7" --tenant "365b7084-5c3e-4b25-8a5e-18fb4e9bd8d5" >/dev/null
+        az login --service-principal -u "${ARM_CLIENT_ID}" -p "${ARM_CLIENT_SECRET}" --tenant "${ARM_TENANT_ID}" >/dev/null
 
     - name: Change directory to Terraform environment
       run: |
-        cd azure-infra/
+        cd ${{ env.TF_Workspace }}
         echo "TF_Workspace is ${{ env.TF_Workspace }}"
         ls -la   # List files and directories in the current directory
-        pwd      # Print the current working directory
+        pwd      # Print the current working directory        
 
     - name: Terraform Init
       run: |
-        cd azure-infra/
+        cd ${{ env.TF_Workspace }}
         terraform init 
 
     - name: Terraform Plan
       run: |
-        cd azure-infra/
+        cd ${{ env.TF_Workspace }}
         terraform plan -input=false
 
     - name: Terraform Apply
       run: |
-        cd azure-infra/
-        terraform apply -auto-approve -input=false
+        cd ${{ env.TF_Workspace }}
+        terraform apply -auto
