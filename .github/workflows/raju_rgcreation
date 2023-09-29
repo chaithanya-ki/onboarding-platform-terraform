@@ -1,0 +1,77 @@
+name: 'storage-flow'
+
+on:
+  push:
+    branches:
+      - dsgstrd
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Choose the environment to deploy the Terraform code
+        options: 
+        - nonprod
+        - qa
+        - prod
+      destroy_resources:
+        type: boolean
+        description: 'Run Terraform Destroy'
+        required: false        
+
+permissions:
+  contents: read
+
+env:
+  TF_Workspace: '${GITHUB_WORKSPACE}/${{ github.event.inputs.environment }}/azure-infra/'
+
+jobs:
+  Terraform_Create:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    env: 
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Install Azure CLI
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+    - name: Login to Azure 
+      run: az login --service-principal -u "${ARM_CLIENT_ID}" -p "${ARM_CLIENT_SECRET}" --tenant "${ARM_TENANT_ID}" >/dev/null
+
+    - name: Change directory to Terraform environment
+      run: |
+        cd ${{ env.TF_Workspace }}
+        echo "TF_Workspace is ${{ env.TF_Workspace }}"
+        ls -la   # List files and directories in the current directory
+        pwd      # Print the current working directory        
+
+    - name: Terraform Init
+      run: |
+        cd ${{ env.TF_Workspace }}
+        terraform init 
+
+    - name: Terraform Plan
+      run: |
+        cd ${{ env.TF_Workspace }}
+        terraform plan -input=false
+
+    - name: Terraform Apply
+      run: |
+        cd ${{ env.TF_Workspace }}
+        terraform apply -auto-approve -input=false || true
+
+    - name: Terraform Destroy
+      if: ${{ github.event.inputs.destroy_resources == 'true' }}
+      run: |
+        cd ${{ env.TF_Workspace }} && terraform destroy -auto-approve
