@@ -1,4 +1,4 @@
-name: Terraform Azure Resource Grou
+name: Terraform Azure Resource Group
 
 on:
   push:
@@ -17,29 +17,36 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          path: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 0.15.0
+        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Initialize Terraform
         run: terraform init
+        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Terraform Plan
         run: terraform plan -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
+        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
+        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Capture Outputs
         id: outputs
         run: echo "::set-output name=resource_group_id::$(terraform output -json resource_group_id)"
+        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Save Terraform State
         run: |
           mkdir -p ${{ github.workspace }}/tfstate
-          cp terraform.tfstate* ${{ github.workspace }}/tfstate/
+          cp nonprod/testing-infra/terraform.tfstate* ${{ github.workspace }}/tfstate/
         if: success()
 
   cleanup:
