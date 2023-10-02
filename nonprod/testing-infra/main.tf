@@ -11,7 +11,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "testing-infra" {
-  name     = "testingrg"
+resource "azurerm_resource_group" "example" {
+  name     = "my-resource-group"
   location = "East US"
 }
