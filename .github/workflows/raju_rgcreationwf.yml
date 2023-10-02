@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 env:
-  TF_Workspace: "${GITHUB_WORKSPACE}/azure-infra/"
+  TF_Workspace: "${GITHUB_WORKSPACE}/nonprod/azure-infra/"
 
 jobs:
   Terraform_Create:
