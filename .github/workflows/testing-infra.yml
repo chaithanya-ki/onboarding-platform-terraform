@@ -9,10 +9,10 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     env:
-      ARM_CLIENT_ID: "f0a2d8fe-8543-4bfa-b024-48a9f84bef8e"
-      ARM_CLIENT_SECRET: "K1K8Q~fP~kdskV1Iwy5qI46qEynSIqgZGwxWqaR7"
-      ARM_SUBSCRIPTION_ID: "2ca58774-7036-497b-b760-19c980c4fb37"
-      ARM_TENANT_ID: "365b7084-5c3e-4b25-8a5e-18fb4e9bd8d5"
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
     steps:
       - name: Checkout code
