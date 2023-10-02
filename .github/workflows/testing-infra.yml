@@ -1,4 +1,4 @@
-name: Terraform Azure Resource Group
+name: Terraform Azure Resource Grou
 
 on:
   push:
