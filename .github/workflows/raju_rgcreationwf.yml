@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 env:
-  TF_Workspace: "onboarding-platform-terraform/nonprod/azure-infra/"
+  TF_Workspace: "${GITHUB_WORKSPACE}/onboarding-platform-terraform/nonprod/azure-infra/"
 
 jobs:
   Terraform_Create:
@@ -48,7 +48,7 @@ jobs:
 
     - name: Change directory to Terraform environment
       run: |
-        cd "onboarding-platform-terraform/nonprod/azure-infra/"
+        cd "${GITHUB_WORKSPACE}/onboarding-platform-terraform/nonprod/azure-infra/"
         echo "TF_Workspace is ${{ env.TF_Workspace }}"
         ls -la   # List files and directories in the current directory
         pwd      # Print the current working directory        
