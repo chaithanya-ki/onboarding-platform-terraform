@@ -17,31 +17,36 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          path: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 0.15.0
-        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
 
       - name: Initialize Terraform
-        run: terraform init
-        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
+        run: |
+          cd nonprod/testing-infra  # Change to the correct directory
+          terraform init
+          cd ../..  # Return to the original working directory
 
       - name: Terraform Plan
-        run: terraform plan -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
-        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
+        run: |
+          cd nonprod/testing-infra  # Change to the correct directory
+          terraform plan -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
+          cd ../..  # Return to the original working directory
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
-        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
+        run: |
+          cd nonprod/testing-infra  # Change to the correct directory
+          terraform apply -auto-approve -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
+          cd ../..  # Return to the original working directory
 
       - name: Capture Outputs
         id: outputs
-        run: echo "::set-output name=resource_group_id::$(terraform output -json resource_group_id)"
-        working-directory: nonprod/testing-infra  # Specify the correct path to your Terraform code
+        run: |
+          cd nonprod/testing-infra  # Change to the correct directory
+          echo "::set-output name=resource_group_id::$(terraform output -json resource_group_id)"
+          cd ../..  # Return to the original working directory
 
       - name: Save Terraform State
         run: |
