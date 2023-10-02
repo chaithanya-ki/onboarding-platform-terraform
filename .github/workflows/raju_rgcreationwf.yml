@@ -3,7 +3,7 @@ name: 'raju_rgcreationwf'
 on:
   push:
     branches:
-      - raju_rgcreation
+      - main
   workflow_dispatch:
     inputs:
       environment:
