@@ -1,0 +1,50 @@
+name: Terraform Azure Resource Group
+
+on:
+  push:
+    branches:
+      - raju_rgcreation
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: "f0a2d8fe-8543-4bfa-b024-48a9f84bef8e"
+      ARM_CLIENT_SECRET: "K1K8Q~fP~kdskV1Iwy5qI46qEynSIqgZGwxWqaR7"
+      ARM_SUBSCRIPTION_ID: "2ca58774-7036-497b-b760-19c980c4fb37"
+      ARM_TENANT_ID: "365b7084-5c3e-4b25-8a5e-18fb4e9bd8d5"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.15.0
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
+
+      - name: Capture Outputs
+        id: outputs
+        run: echo "::set-output name=resource_group_id::$(terraform output -json resource_group_id)"
+
+      - name: Save Terraform State
+        run: |
+          mkdir -p ${{ github.workspace }}/tfstate
+          cp terraform.tfstate* ${{ github.workspace }}/tfstate/
+        if: success()
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - name: Delete Terraform files
+        run: rm -rf ${{ github.workspace }}/tfstate
