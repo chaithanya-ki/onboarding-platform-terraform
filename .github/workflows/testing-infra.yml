@@ -27,26 +27,26 @@ jobs:
         run: |
           cd nonprod/testing-infra  # Change to the correct directory
           terraform init
-          cd ../..  # Return to the original working directory
+          cd nonprod/testing-infra  # Return to the original working directory
 
       - name: Terraform Plan
         run: |
           cd nonprod/testing-infra  # Change to the correct directory
           terraform plan -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
-          cd ../..  # Return to the original working directory
+          cd nonprod/testing-infra  # Return to the original working directory
 
       - name: Terraform Apply
         run: |
           cd nonprod/testing-infra  # Change to the correct directory
           terraform apply -auto-approve -var="resource_group_name=my-resource-group" -var="resource_group_location=East US"
-          cd ../..  # Return to the original working directory
+          cd nonprod/testing-infra  # Return to the original working directory
 
       - name: Capture Outputs
         id: outputs
         run: |
           cd nonprod/testing-infra  # Change to the correct directory
           echo "::set-output name=resource_group_id::$(terraform output -json resource_group_id)"
-          cd ../..  # Return to the original working directory
+          cd nonprod/testing-infra  # Return to the original working directory
 
       - name: Save Terraform State
         run: |
